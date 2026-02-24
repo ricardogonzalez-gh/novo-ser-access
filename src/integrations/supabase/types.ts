@@ -14,6 +14,230 @@ export type Database = {
   }
   public: {
     Tables: {
+      config_kpis: {
+        Row: {
+          alimenta_kpi: string | null
+          area: string | null
+          ativo: boolean | null
+          codigo: string
+          created_at: string | null
+          descricao: string | null
+          faixa_amarela: number | null
+          faixa_verde: number | null
+          fonte: string | null
+          frequencia: string | null
+          id: string
+          meta_texto: string | null
+          meta_valor: number | null
+          nome: string
+          perspectiva: string | null
+          projeto: string | null
+          tipo: string | null
+          unidade: string | null
+        }
+        Insert: {
+          alimenta_kpi?: string | null
+          area?: string | null
+          ativo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          descricao?: string | null
+          faixa_amarela?: number | null
+          faixa_verde?: number | null
+          fonte?: string | null
+          frequencia?: string | null
+          id?: string
+          meta_texto?: string | null
+          meta_valor?: number | null
+          nome: string
+          perspectiva?: string | null
+          projeto?: string | null
+          tipo?: string | null
+          unidade?: string | null
+        }
+        Update: {
+          alimenta_kpi?: string | null
+          area?: string | null
+          ativo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          descricao?: string | null
+          faixa_amarela?: number | null
+          faixa_verde?: number | null
+          fonte?: string | null
+          frequencia?: string | null
+          id?: string
+          meta_texto?: string | null
+          meta_valor?: number | null
+          nome?: string
+          perspectiva?: string | null
+          projeto?: string | null
+          tipo?: string | null
+          unidade?: string | null
+        }
+        Relationships: []
+      }
+      dados_kpis: {
+        Row: {
+          created_at: string | null
+          data_registro: string
+          fonte_origem: string | null
+          id: string
+          kpi_id: string | null
+          observacoes: string | null
+          periodo: string
+          registrado_por: string | null
+          status_semaforo: string | null
+          updated_at: string | null
+          valor_numerico: number | null
+          valor_texto: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_registro?: string
+          fonte_origem?: string | null
+          id?: string
+          kpi_id?: string | null
+          observacoes?: string | null
+          periodo: string
+          registrado_por?: string | null
+          status_semaforo?: string | null
+          updated_at?: string | null
+          valor_numerico?: number | null
+          valor_texto?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data_registro?: string
+          fonte_origem?: string | null
+          id?: string
+          kpi_id?: string | null
+          observacoes?: string | null
+          periodo?: string
+          registrado_por?: string | null
+          status_semaforo?: string | null
+          updated_at?: string | null
+          valor_numerico?: number | null
+          valor_texto?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dados_kpis_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "config_kpis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dados_kpis_registrado_por_fkey"
+            columns: ["registrado_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financeiro: {
+        Row: {
+          created_at: string | null
+          despesas_admin: number | null
+          despesas_programaticas: number | null
+          id: string
+          orcamento_periodo: number | null
+          origem_dados: string | null
+          periodo: string
+          projeto_id: string | null
+          registrado_por: string | null
+          saldo: number | null
+          valor_captado: number | null
+          valor_executado: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          despesas_admin?: number | null
+          despesas_programaticas?: number | null
+          id?: string
+          orcamento_periodo?: number | null
+          origem_dados?: string | null
+          periodo: string
+          projeto_id?: string | null
+          registrado_por?: string | null
+          saldo?: number | null
+          valor_captado?: number | null
+          valor_executado?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          despesas_admin?: number | null
+          despesas_programaticas?: number | null
+          id?: string
+          orcamento_periodo?: number | null
+          origem_dados?: string | null
+          periodo?: string
+          projeto_id?: string | null
+          registrado_por?: string | null
+          saldo?: number | null
+          valor_captado?: number | null
+          valor_executado?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financeiro_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financeiro_registrado_por_fkey"
+            columns: ["registrado_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      log_atualizacoes: {
+        Row: {
+          acao: string | null
+          created_at: string | null
+          dados_anteriores: Json | null
+          dados_novos: Json | null
+          id: string
+          registro_id: string
+          tabela: string
+          usuario_id: string | null
+        }
+        Insert: {
+          acao?: string | null
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          id?: string
+          registro_id: string
+          tabela: string
+          usuario_id?: string | null
+        }
+        Update: {
+          acao?: string | null
+          created_at?: string | null
+          dados_anteriores?: Json | null
+          dados_novos?: Json | null
+          id?: string
+          registro_id?: string
+          tabela?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "log_atualizacoes_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           area: string | null
@@ -38,12 +262,74 @@ export type Database = {
         }
         Relationships: []
       }
+      projetos: {
+        Row: {
+          created_at: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          fonte_financiamento: string | null
+          id: string
+          nome: string
+          orcamento_aprovado: number | null
+          responsavel_id: string | null
+          sigla: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          fonte_financiamento?: string | null
+          id?: string
+          nome: string
+          orcamento_aprovado?: number | null
+          responsavel_id?: string | null
+          sigla?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          fonte_financiamento?: string | null
+          id?: string
+          nome?: string
+          orcamento_aprovado?: number | null
+          responsavel_id?: string | null
+          sigla?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projetos_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      v_custo_por_beneficiario: {
+        Row: {
+          custo_por_beneficiario: number | null
+          periodo: string | null
+          projeto: string | null
+        }
+        Relationships: []
+      }
+      v_diversificacao_receitas: {
+        Row: {
+          fontes_acima_10pct: number | null
+          periodo: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_user_area: { Args: never; Returns: string }
+      get_user_role: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
