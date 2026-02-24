@@ -8,6 +8,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Login from "./pages/Login";
 import AccessDenied from "./pages/AccessDenied";
 import Dashboard from "./pages/Dashboard";
+import Placeholder from "./pages/Placeholder";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/operacionais"
+              element={
+                <ProtectedRoute>
+                  <Placeholder title="KPIs Operacionais" />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/entrada-dados"
+              element={
+                <ProtectedRoute>
+                  <Placeholder title="Entrada de Dados" />
                 </ProtectedRoute>
               }
             />
