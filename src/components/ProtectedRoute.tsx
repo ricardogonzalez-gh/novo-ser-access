@@ -13,7 +13,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!session) return <Navigate to="/login" replace />;
-  if (isDomainAllowed === false) return <Navigate to="/acesso-negado" replace />;
+  if (isDomainAllowed !== true) return <Navigate to="/acesso-negado" replace />;
 
   return <>{children}</>;
 };

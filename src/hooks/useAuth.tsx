@@ -34,11 +34,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
       .single();
+    if (error) {
+      console.error("Erro ao buscar perfil:", error);
+    }
     setProfile(data);
   };
 
@@ -53,6 +56,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setIsDomainAllowed(allowed);
           if (allowed) {
             await fetchProfile(session.user.id);
+          } else {
+            await supabase.auth.signOut();
           }
         } else {
           setIsDomainAllowed(null);
@@ -70,6 +75,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsDomainAllowed(allowed);
         if (allowed) {
           fetchProfile(session.user.id);
+        } else {
+          supabase.auth.signOut();
         }
       }
       setLoading(false);
