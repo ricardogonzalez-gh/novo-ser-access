@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -20,6 +20,16 @@ import {
 } from "@/components/ui/table";
 import { ArrowUpDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 type SortKey = "codigo" | "nome" | "valor" | "area" | "alimenta_kpi";
 
@@ -63,6 +73,36 @@ const Operacionais = () => {
       const semaforo = calcularSemaforo(valor, k.meta_valor, k.faixa_verde ?? 80, k.faixa_amarela ?? 50);
       return { ...k, valor, semaforo };
     });
+
+  // Build bar chart data: group operational KPIs by their strategic parent
+  const barChartData = useMemo(() => {
+    const allOps = (kpisQuery.data ?? []).map((k) => {
+      const dado = (dadosQuery.data ?? []).find((d) => d.kpi_id === k.id);
+      const valor = dado?.valor_numerico ?? null;
+      const semaforo = calcularSemaforo(valor, k.meta_valor, k.faixa_verde ?? 80, k.faixa_amarela ?? 50);
+      return { ...k, semaforo };
+    });
+
+    const grouped: Record<string, { verde: number; amarelo: number; vermelho: number; cinza: number }> = {};
+
+    for (const op of allOps) {
+      const parent = op.alimenta_kpi ?? "Sem vínculo";
+      if (!grouped[parent]) grouped[parent] = { verde: 0, amarelo: 0, vermelho: 0, cinza: 0 };
+      if (op.semaforo === "verde") grouped[parent].verde++;
+      else if (op.semaforo === "amarelo") grouped[parent].amarelo++;
+      else if (op.semaforo === "vermelho") grouped[parent].vermelho++;
+      else grouped[parent].cinza++;
+    }
+
+    return Object.entries(grouped)
+      .sort((a, b) => {
+        const totalA = a[1].verde + a[1].amarelo + a[1].vermelho + a[1].cinza;
+        const totalB = b[1].verde + b[1].amarelo + b[1].vermelho + b[1].cinza;
+        return totalB - totalA;
+      })
+      .slice(0, 5)
+      .map(([key, counts]) => ({ kpi: key, ...counts }));
+  }, [kpisQuery.data, dadosQuery.data]);
 
   const toggle = (key: SortKey) => {
     if (sortKey === key) setSortAsc(!sortAsc);
@@ -123,6 +163,28 @@ const Operacionais = () => {
             </Select>
           </div>
         </div>
+
+        {/* Bar chart */}
+        {!isLoading && barChartData.length > 0 && (
+          <div className="rounded-lg border bg-card p-4">
+            <h2 className="text-sm font-semibold text-foreground mb-4">
+              Saúde dos Indicadores Operacionais por KPI Estratégico
+            </h2>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={barChartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="kpi" tick={{ fontSize: 11 }} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="verde" name="Verde" fill="#22c55e" stackId="a" />
+                <Bar dataKey="amarelo" name="Amarelo" fill="#eab308" stackId="a" />
+                <Bar dataKey="vermelho" name="Vermelho" fill="#ef4444" stackId="a" />
+                <Bar dataKey="cinza" name="Sem meta" fill="#9ca3af" stackId="a" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
 
         {isLoading ? (
           <p className="text-muted-foreground text-center py-12">Carregando dados...</p>

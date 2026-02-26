@@ -5,19 +5,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Download } from "lucide-react";
 import type { Filters } from "@/hooks/useDashboardData";
 
 interface Props {
   filters: Filters;
   onChange: (f: Filters) => void;
+  onExport: () => void;
 }
 
-const GlobalFilters = ({ filters, onChange }: Props) => {
-  const set = (key: keyof Filters, value: string) =>
+const GlobalFilters = ({ filters, onChange, onExport }: Props) => {
+  const set = (key: keyof Filters, value: string | boolean) =>
     onChange({ ...filters, [key]: value });
 
   return (
-    <div className="flex flex-wrap gap-3 rounded-lg border bg-card p-3">
+    <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card p-3">
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium text-muted-foreground">Período</span>
         <Select value={filters.periodo} onValueChange={(v) => set("periodo", v)}>
@@ -55,6 +59,21 @@ const GlobalFilters = ({ filters, onChange }: Props) => {
             <SelectItem value="Comunicação">Comunicação</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="flex items-center gap-2 ml-auto">
+        <label className="flex items-center gap-1.5 text-sm text-muted-foreground cursor-pointer">
+          <Switch
+            checked={filters.comparar}
+            onCheckedChange={(v) => set("comparar", v)}
+          />
+          Comparar
+        </label>
+
+        <Button variant="outline" size="sm" onClick={onExport}>
+          <Download className="h-4 w-4 mr-1" />
+          Exportar
+        </Button>
       </div>
     </div>
   );
