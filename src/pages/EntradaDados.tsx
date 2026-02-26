@@ -301,7 +301,7 @@ const EntradaDados = () => {
                             className="w-32"
                             value={entry?.valor_numerico ?? ""}
                             onChange={(e) => updateField(kpi.id, "valor_numerico", e.target.value)}
-                            disabled={kpi.fonte !== "Manual" && !!kpi.fonte}
+                            disabled={false}
                           />
                           <Input
                             placeholder="Observações"
