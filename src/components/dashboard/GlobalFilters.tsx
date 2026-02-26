@@ -23,11 +23,11 @@ const GlobalFilters = ({ filters, onChange }: Props) => {
         <Select value={filters.periodo} onValueChange={(v) => set("periodo", v)}>
           <SelectTrigger className="w-28 bg-background"><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="T1">T1</SelectItem>
-            <SelectItem value="T2">T2</SelectItem>
-            <SelectItem value="T3">T3</SelectItem>
-            <SelectItem value="T4">T4</SelectItem>
-            <SelectItem value="Anual">Anual</SelectItem>
+            <SelectItem value="2026-T1">T1</SelectItem>
+            <SelectItem value="2026-T2">T2</SelectItem>
+            <SelectItem value="2026-T3">T3</SelectItem>
+            <SelectItem value="2026-T4">T4</SelectItem>
+            <SelectItem value="2026-Anual">Anual</SelectItem>
           </SelectContent>
         </Select>
       </div>
