@@ -8,7 +8,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Login from "./pages/Login";
 import AccessDenied from "./pages/AccessDenied";
 import Dashboard from "./pages/Dashboard";
-import Placeholder from "./pages/Placeholder";
+import EntradaDados from "./pages/EntradaDados";
+import Operacionais from "./pages/Operacionais";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,7 +36,7 @@ const App = () => (
               path="/operacionais"
               element={
                 <ProtectedRoute>
-                  <Placeholder title="KPIs Operacionais" />
+                  <Operacionais />
                 </ProtectedRoute>
               }
             />
@@ -43,7 +44,7 @@ const App = () => (
               path="/entrada-dados"
               element={
                 <ProtectedRoute>
-                  <Placeholder title="Entrada de Dados" />
+                  <EntradaDados />
                 </ProtectedRoute>
               }
             />

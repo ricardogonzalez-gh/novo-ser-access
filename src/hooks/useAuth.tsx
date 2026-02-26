@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .eq("id", userId)
       .single();
     if (error) {
-      console.error("Erro ao buscar perfil:", error);
+      console.error("Erro ao buscar perfil:", error.message);
     }
     setProfile(data);
   };
