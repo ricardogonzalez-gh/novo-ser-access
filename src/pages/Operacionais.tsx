@@ -25,7 +25,7 @@ type SortKey = "codigo" | "nome" | "valor" | "area" | "alimenta_kpi";
 
 const Operacionais = () => {
   const navigate = useNavigate();
-  const [periodo, setPeriodo] = useState("T1");
+  const [periodo, setPeriodo] = useState("2026-T1");
   const [areaFilter, setAreaFilter] = useState("Todas");
   const [sortKey, setSortKey] = useState<SortKey>("codigo");
   const [sortAsc, setSortAsc] = useState(true);
