@@ -7,7 +7,7 @@ import { useDashboardData, type Filters } from "@/hooks/useDashboardData";
 
 const Dashboard = () => {
   const [filters, setFilters] = useState<Filters>({
-    periodo: "T1",
+    periodo: "2026-T1",
     projeto: "Todos",
     area: "Todas",
   });
