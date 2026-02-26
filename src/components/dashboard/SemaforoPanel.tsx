@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Heart, Settings, Handshake, Megaphone, ChevronDown, ChevronUp } from "lucide-react";
 import type { KpiRow } from "@/hooks/useDashboardData";
 import { semaforoCores, type SemaforoStatus } from "@/lib/semaforo";
+import { useSparklineData } from "@/hooks/useKpiEvolution";
+import SparklineChart from "./SparklineChart";
 
 const perspectivas = [
   { key: "A", label: "Sustentabilidade Financeira", icon: DollarSign },
@@ -25,6 +27,12 @@ const Dot = ({ color, count }: { color: string; count: number }) => (
 
 const SemaforoPanel = ({ kpis }: { kpis: KpiRow[] }) => {
   const [expanded, setExpanded] = useState<string | null>(null);
+
+  const expandedKpiIds = expanded
+    ? kpis.filter((k) => k.perspectiva === expanded).map((k) => k.id)
+    : [];
+
+  const { data: sparkData } = useSparklineData(expandedKpiIds);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -65,14 +73,17 @@ const SemaforoPanel = ({ kpis }: { kpis: KpiRow[] }) => {
               {isOpen && (
                 <div className="mt-4 space-y-2 border-t pt-3">
                   {pKpis.map((k) => (
-                    <div key={k.id} className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">
+                    <div key={k.id} className="flex items-center justify-between text-sm gap-2">
+                      <span className="text-muted-foreground truncate">
                         <span className="font-medium text-foreground">{k.codigo}</span> — {k.nome}
                       </span>
-                      <span
-                        className="inline-block h-3 w-3 rounded-full shrink-0"
-                        style={{ backgroundColor: semaforoCores[k.semaforo] }}
-                      />
+                      <div className="flex items-center gap-2 shrink-0">
+                        <SparklineChart data={sparkData?.[k.id] ?? []} />
+                        <span
+                          className="inline-block h-3 w-3 rounded-full"
+                          style={{ backgroundColor: semaforoCores[k.semaforo] }}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>

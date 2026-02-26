@@ -6,6 +6,7 @@ export interface Filters {
   periodo: string;
   projeto: string;
   area: string;
+  comparar: boolean;
 }
 
 export interface KpiRow {
@@ -21,6 +22,19 @@ export interface KpiRow {
   valor: number | null;
   percentual: number | null;
   semaforo: SemaforoStatus;
+  valorAnterior: number | null;
+  tendencia: "up" | "down" | "equal" | null;
+}
+
+const PERIODOS_ORDER = ["T1", "T2", "T3", "T4"];
+
+function periodoAnterior(periodo: string): string | null {
+  const match = periodo.match(/^(\d{4})-(T[1-4])$/);
+  if (!match) return null;
+  const [, yearStr, tri] = match;
+  const idx = PERIODOS_ORDER.indexOf(tri);
+  if (idx > 0) return `${yearStr}-${PERIODOS_ORDER[idx - 1]}`;
+  return `${Number(yearStr) - 1}-T4`;
 }
 
 export function useDashboardData(filters: Filters) {
@@ -49,6 +63,21 @@ export function useDashboardData(filters: Filters) {
     },
   });
 
+  const prevPeriodo = filters.comparar ? periodoAnterior(filters.periodo) : null;
+
+  const prevQuery = useQuery({
+    queryKey: ["dados-kpis-prev", prevPeriodo],
+    enabled: !!prevPeriodo,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("dados_kpis")
+        .select("*")
+        .eq("periodo", prevPeriodo!);
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const kpis: KpiRow[] = (kpisQuery.data ?? [])
     .filter((k) => {
       if (filters.area !== "Todas" && k.area !== filters.area) return false;
@@ -69,6 +98,19 @@ export function useDashboardData(filters: Filters) {
         k.faixa_verde ?? 80,
         k.faixa_amarela ?? 50
       );
+
+      let valorAnterior: number | null = null;
+      let tendencia: "up" | "down" | "equal" | null = null;
+      if (filters.comparar && prevQuery.data) {
+        const prev = prevQuery.data.find((d) => d.kpi_id === k.id);
+        valorAnterior = prev?.valor_numerico ?? null;
+        if (valor != null && valorAnterior != null) {
+          if (valor > valorAnterior) tendencia = "up";
+          else if (valor < valorAnterior) tendencia = "down";
+          else tendencia = "equal";
+        }
+      }
+
       return {
         id: k.id,
         codigo: k.codigo,
@@ -82,6 +124,8 @@ export function useDashboardData(filters: Filters) {
         valor,
         percentual,
         semaforo,
+        valorAnterior,
+        tendencia,
       };
     });
 
