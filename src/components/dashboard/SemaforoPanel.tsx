@@ -7,11 +7,11 @@ import { useSparklineData } from "@/hooks/useKpiEvolution";
 import SparklineChart from "./SparklineChart";
 
 const perspectivas = [
-  { key: "A", label: "Sustentabilidade Financeira", icon: DollarSign },
-  { key: "B", label: "Impacto Social", icon: Heart },
-  { key: "C", label: "Excelência Operacional", icon: Settings },
-  { key: "D", label: "Parcerias e Rede", icon: Handshake },
-  { key: "E", label: "Comunicação e Visibilidade", icon: Megaphone },
+  { key: "A", label: "Sustentabilidade Financeira", icon: DollarSign, color: "#eec833" },
+  { key: "B", label: "Impacto Social", icon: Heart, color: "#d27f7b" },
+  { key: "C", label: "Excelência Operacional", icon: Settings, color: "#8dbb9d" },
+  { key: "D", label: "Parcerias e Rede", icon: Handshake, color: "#ad93bf" },
+  { key: "E", label: "Comunicação e Visibilidade", icon: Megaphone, color: "#9a999e" },
 ];
 
 function countByStatus(kpis: KpiRow[], status: SemaforoStatus) {
@@ -19,7 +19,7 @@ function countByStatus(kpis: KpiRow[], status: SemaforoStatus) {
 }
 
 const Dot = ({ color, count }: { color: string; count: number }) => (
-  <div className="flex items-center gap-1.5">
+  <div className="flex items-center gap-1.5 bg-muted/30 rounded-full px-2 py-0.5 border border-border/50">
     <span className="inline-block h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
     <span className="text-sm font-semibold">{count}</span>
   </div>
@@ -44,19 +44,22 @@ const SemaforoPanel = ({ kpis }: { kpis: KpiRow[] }) => {
         return (
           <Card
             key={p.key}
-            className="cursor-pointer hover:shadow-md transition-shadow"
+            className="cursor-pointer bg-white shadow-sm border border-[#f0f0f0] rounded-xl hover:shadow-md hover:scale-[1.01] transition-all duration-200"
+            style={{ borderLeftWidth: "4px", borderLeftColor: p.color }}
             onClick={() => setExpanded(isOpen ? null : p.key)}
           >
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Icon className="h-5 w-5 text-muted-foreground" />
-                  <CardTitle className="text-sm font-semibold">{p.label}</CardTitle>
+                  <div className="p-1.5 rounded-md" style={{ backgroundColor: `${p.color}15`, color: p.color }}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <CardTitle className="text-sm font-semibold font-heading text-[#2d2d2d] leading-none">{p.label}</CardTitle>
                 </div>
                 {isOpen ? (
-                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                  <ChevronUp className="h-4 w-4 text-muted-foreground transition-transform" />
                 ) : (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
                 )}
               </div>
             </CardHeader>

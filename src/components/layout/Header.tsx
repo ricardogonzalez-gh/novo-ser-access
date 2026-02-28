@@ -24,10 +24,11 @@ const Header = () => {
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
           <SidebarTrigger className="mr-1" />
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
-            NS
+          <img src="/logo-ins.png" alt="Instituto Novo Ser" className="h-10 w-auto object-contain hidden sm:block" />
+          <div className="flex flex-col">
+            <span className="font-heading font-semibold text-[#2d2d2d] hidden sm:block">Instituto Novo Ser</span>
+            <span className="font-body font-normal text-sm text-[#9a999e] hidden sm:block">Painel de KPIs</span>
           </div>
-          <span className="font-semibold text-foreground hidden sm:inline">Instituto Novo Ser</span>
         </div>
         <div className="flex items-center gap-3">
           <Badge variant="secondary" className="hidden sm:inline-flex">{roleLabel}</Badge>

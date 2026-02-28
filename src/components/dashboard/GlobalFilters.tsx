@@ -21,11 +21,11 @@ const GlobalFilters = ({ filters, onChange, onExport }: Props) => {
     onChange({ ...filters, [key]: value });
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card p-3">
+    <div className="flex flex-wrap items-center gap-3 rounded-lg bg-white border border-[#f0f0f0] shadow-sm p-4">
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium text-muted-foreground">Período</span>
         <Select value={filters.periodo} onValueChange={(v) => set("periodo", v)}>
-          <SelectTrigger className="w-28 bg-background"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-28 bg-[#fafbfc] border-[#f0f0f0] rounded-lg h-9"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="2026-T1">T1</SelectItem>
             <SelectItem value="2026-T2">T2</SelectItem>
@@ -39,7 +39,7 @@ const GlobalFilters = ({ filters, onChange, onExport }: Props) => {
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium text-muted-foreground">Projeto</span>
         <Select value={filters.projeto} onValueChange={(v) => set("projeto", v)}>
-          <SelectTrigger className="w-28 bg-background"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-28 bg-[#fafbfc] border-[#f0f0f0] rounded-lg h-9"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="Todos">Todos</SelectItem>
             <SelectItem value="PPT">PPT</SelectItem>
@@ -51,7 +51,7 @@ const GlobalFilters = ({ filters, onChange, onExport }: Props) => {
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium text-muted-foreground">Área</span>
         <Select value={filters.area} onValueChange={(v) => set("area", v)}>
-          <SelectTrigger className="w-32 bg-background"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-32 bg-[#fafbfc] border-[#f0f0f0] rounded-lg h-9"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="Todas">Todas</SelectItem>
             <SelectItem value="Financeiro">Financeiro</SelectItem>
@@ -70,7 +70,7 @@ const GlobalFilters = ({ filters, onChange, onExport }: Props) => {
           Comparar
         </label>
 
-        <Button variant="outline" size="sm" onClick={onExport}>
+        <Button variant="outline" size="sm" onClick={onExport} className="border-[#ad93bf] text-[#ad93bf] hover:bg-[#ad93bf]/10 bg-transparent shadow-none">
           <Download className="h-4 w-4 mr-1" />
           Exportar
         </Button>

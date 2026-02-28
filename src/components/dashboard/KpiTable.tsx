@@ -64,16 +64,16 @@ const KpiTable = ({ kpis, showComparison, onRowClick }: Props) => {
   return (
     <div className="rounded-lg border bg-card overflow-auto">
       <Table>
-        <TableHeader>
-          <TableRow>
+        <TableHeader className="bg-[#f5f0f8]">
+          <TableRow className="hover:bg-transparent border-b-[#f0f0f0]">
             <SortHeader label="Código" col="codigo" />
             <SortHeader label="Nome" col="nome" />
             <SortHeader label="Valor" col="valor" />
             <SortHeader label="Meta" col="meta_valor" />
             <SortHeader label="% Atingido" col="percentual" />
-            <TableHead className="w-12">Status</TableHead>
-            {showComparison && <TableHead className="whitespace-nowrap">Anterior</TableHead>}
-            {showComparison && <TableHead className="w-12">Tend.</TableHead>}
+            <TableHead className="w-12 text-[#4a4a4a] whitespace-nowrap">Status</TableHead>
+            {showComparison && <TableHead className="whitespace-nowrap text-[#4a4a4a]">Anterior</TableHead>}
+            {showComparison && <TableHead className="w-12 text-[#4a4a4a] whitespace-nowrap">Tend.</TableHead>}
             <SortHeader label="Área" col="area" />
           </TableRow>
         </TableHeader>
@@ -81,7 +81,7 @@ const KpiTable = ({ kpis, showComparison, onRowClick }: Props) => {
           {sorted.map((k) => (
             <TableRow
               key={k.id}
-              className="cursor-pointer hover:bg-muted/50"
+              className="cursor-pointer hover:bg-[#d27f7b]/5 even:bg-[#fafbfc] transition-colors duration-150 border-b-[#f0f0f0]"
               onClick={() => onRowClick(k)}
             >
               <TableCell className="font-medium">{k.codigo}</TableCell>
@@ -90,11 +90,16 @@ const KpiTable = ({ kpis, showComparison, onRowClick }: Props) => {
               <TableCell>{k.meta_valor != null ? k.meta_valor : "—"}</TableCell>
               <TableCell>{k.percentual != null ? `${k.percentual}%` : "—"}</TableCell>
               <TableCell>
-                <span
-                  className="inline-block h-3 w-3 rounded-full"
-                  style={{ backgroundColor: semaforoCores[k.semaforo] }}
-                  title={k.semaforo}
-                />
+                <div className="flex items-center justify-center">
+                  <span
+                    className="inline-block h-3.5 w-3.5 rounded-full ring-2 ring-offset-1"
+                    style={{
+                      backgroundColor: semaforoCores[k.semaforo],
+                      "--tw-ring-color": `${semaforoCores[k.semaforo]}40`
+                    } as React.CSSProperties}
+                    title={k.semaforo}
+                  />
+                </div>
               </TableCell>
               {showComparison && (
                 <TableCell className="text-muted-foreground">

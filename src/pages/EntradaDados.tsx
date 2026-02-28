@@ -44,6 +44,17 @@ const perspectivaLabels: Record<string, string> = {
 
 const perspectivaOrder = ["A", "B", "C", "D", "E", "OP"];
 
+const getPerspectivaColor = (key: string) => {
+  switch (key) {
+    case "A": return "#eec833";
+    case "B": return "#d27f7b";
+    case "C": return "#8dbb9d";
+    case "D": return "#ad93bf";
+    case "E": return "#9a999e";
+    default: return "#f0f0f0";
+  }
+};
+
 interface FormEntry {
   kpi_id: string;
   valor_numerico: string;
@@ -200,8 +211,8 @@ const EntradaDados = () => {
       toast({ title: "Dados salvos com sucesso" });
       queryClient.invalidateQueries({ queryKey: ["entrada-dados", periodo] });
       queryClient.invalidateQueries({ queryKey: ["dados-kpis"] });
-    } catch (err: any) {
-      toast({ title: "Erro ao salvar", description: err.message, variant: "destructive" });
+    } catch (err: unknown) {
+      toast({ title: "Erro ao salvar", description: (err as Error).message, variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -248,9 +259,13 @@ const EntradaDados = () => {
         ) : (
           <>
             {grouped.map((group) => (
-              <Card key={group.key}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">{group.label}</CardTitle>
+              <Card
+                key={group.key}
+                className="bg-white shadow-sm border border-[#f0f0f0] rounded-xl"
+                style={{ borderLeftWidth: "4px", borderLeftColor: getPerspectivaColor(group.key) }}
+              >
+                <CardHeader className="pb-3 border-b border-[#f0f0f0]/50 mb-4">
+                  <CardTitle className="text-base font-heading text-[#2d2d2d]">{group.label}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {group.kpis.map((kpi) => {
@@ -288,8 +303,11 @@ const EntradaDados = () => {
 
                         <div className="flex items-center justify-center pt-1">
                           <span
-                            className="inline-block h-4 w-4 rounded-full shrink-0"
-                            style={{ backgroundColor: semaforoCores[semaforo] }}
+                            className="inline-block h-4 w-4 rounded-full shrink-0 animate-pulse ring-2 ring-offset-2"
+                            style={{
+                              backgroundColor: semaforoCores[semaforo],
+                              "--tw-ring-color": `${semaforoCores[semaforo]}40`
+                            } as React.CSSProperties}
                             title={semaforo}
                           />
                         </div>
@@ -298,14 +316,14 @@ const EntradaDados = () => {
                           <Input
                             type="number"
                             placeholder="Valor"
-                            className="w-32"
+                            className="w-32 focus-visible:ring-2 focus-visible:ring-[#ad93bf] focus-visible:ring-offset-2"
                             value={entry?.valor_numerico ?? ""}
                             onChange={(e) => updateField(kpi.id, "valor_numerico", e.target.value)}
                             disabled={false}
                           />
                           <Input
                             placeholder="Observações"
-                            className="flex-1"
+                            className="flex-1 focus-visible:ring-2 focus-visible:ring-[#ad93bf] focus-visible:ring-offset-2"
                             value={entry?.observacoes ?? ""}
                             onChange={(e) => updateField(kpi.id, "observacoes", e.target.value)}
                           />
@@ -323,8 +341,13 @@ const EntradaDados = () => {
               </Card>
             ))}
 
-            <div className="flex justify-end">
-              <Button onClick={handleSave} disabled={saving} size="lg">
+            <div className="flex justify-end mt-8">
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                size="lg"
+                className="bg-gradient-to-r from-[#ad93bf] to-[#9678ab] shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 text-white border-0"
+              >
                 <Save className="h-4 w-4 mr-2" />
                 {saving ? "Salvando..." : "Salvar todos"}
               </Button>

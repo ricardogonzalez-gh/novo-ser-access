@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Montserrat:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,33 +10,42 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Background principal: #fafbfc -> hsl(210, 33%, 98%) */
+    --background: 210 33% 98%;
+    /* Texto principal: #4a4a4a -> hsl(0, 0%, 29%) */
+    --foreground: 0 0% 29%;
 
+    /* Card background: #ffffff */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 29%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 29%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Títulos/Headings: #2d2d2d -> hsl(0, 0%, 18%) */
+    --primary: 0 0% 18%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secundaria (utilizada como base para os gradientes e detalhes): Lilás #ad93bf -> hsl(276, 26%, 66%) */
+    --secondary: 276 26% 66%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Neutro/Texto secundário: #9a999e -> hsl(240, 2%, 61%) */
+    --muted: 240 2% 96%;
+    --muted-foreground: 240 2% 61%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 276 26% 96%;
+    --accent-foreground: 0 0% 18%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destrutivo/Quente: Rosa #d27f7b -> hsl(3, 50%, 65%) */
+    --destructive: 3 50% 65%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Border sutil: #f0f0f0 -> hsl(0, 0%, 94%) */
+    --border: 0 0% 94%;
+    --input: 240 2% 90%;
+    /* Foco lilás base */
+    --ring: 276 26% 66%;
 
     --radius: 0.5rem;
 
@@ -100,6 +111,15 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading text-primary;
   }
 }
