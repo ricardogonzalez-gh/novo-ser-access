@@ -29,12 +29,36 @@ export interface KpiRow {
 const PERIODOS_ORDER = ["T1", "T2", "T3", "T4"];
 
 function periodoAnterior(periodo: string): string | null {
+  if (periodo.endsWith("-Anual")) {
+    const yearStr = periodo.split("-")[0];
+    return `${Number(yearStr) - 1}-Anual`;
+  }
   const match = periodo.match(/^(\d{4})-(T[1-4])$/);
   if (!match) return null;
   const [, yearStr, tri] = match;
   const idx = PERIODOS_ORDER.indexOf(tri);
   if (idx > 0) return `${yearStr}-${PERIODOS_ORDER[idx - 1]}`;
   return `${Number(yearStr) - 1}-T4`;
+}
+
+function consolidarValores(valores: number[], unidade: string | null): number | null {
+  if (valores.length === 0) return null;
+  const validos = valores.filter((v) => v != null);
+  if (validos.length === 0) return null;
+
+  if (unidade === "R$" || unidade === "nº") {
+    // Soma
+    return validos.reduce((acc, curr) => acc + curr, 0);
+  } else if (unidade === "%" || unidade === "1-5") {
+    // Média
+    const sum = validos.reduce((acc, curr) => acc + curr, 0);
+    return Number((sum / validos.length).toFixed(2));
+  } else if (unidade === "S/N") {
+    // Último valor (assumindo ordem baseada em T1 a T4 sendo inserida sequencialmente se ordenada antes)
+    return validos[validos.length - 1];
+  }
+  // Fallback para soma
+  return validos.reduce((acc, curr) => acc + curr, 0);
 }
 
 export function useDashboardData(filters: Filters) {
@@ -54,10 +78,18 @@ export function useDashboardData(filters: Filters) {
   const dadosQuery = useQuery({
     queryKey: ["dados-kpis", filters.periodo],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("dados_kpis")
-        .select("*")
-        .eq("periodo", filters.periodo);
+      const isAnual = filters.periodo.endsWith("-Anual");
+      const year = filters.periodo.split("-")[0];
+
+      let query = supabase.from("dados_kpis").select("*");
+
+      if (isAnual) {
+        query = query.like("periodo", `${year}-T%`).order("periodo", { ascending: true });
+      } else {
+        query = query.eq("periodo", filters.periodo);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
@@ -69,10 +101,18 @@ export function useDashboardData(filters: Filters) {
     queryKey: ["dados-kpis-prev", prevPeriodo],
     enabled: !!prevPeriodo,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("dados_kpis")
-        .select("*")
-        .eq("periodo", prevPeriodo!);
+      const isAnual = prevPeriodo!.endsWith("-Anual");
+      const year = prevPeriodo!.split("-")[0];
+
+      let query = supabase.from("dados_kpis").select("*");
+
+      if (isAnual) {
+        query = query.like("periodo", `${year}-T%`).order("periodo", { ascending: true });
+      } else {
+        query = query.eq("periodo", prevPeriodo!);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
@@ -85,8 +125,16 @@ export function useDashboardData(filters: Filters) {
       return true;
     })
     .map((k) => {
-      const dado = (dadosQuery.data ?? []).find((d) => d.kpi_id === k.id);
-      const valor = dado?.valor_numerico ?? null;
+      const isAnual = filters.periodo.endsWith("-Anual");
+      const kpiDados = (dadosQuery.data ?? []).filter((d) => d.kpi_id === k.id);
+
+      let valor: number | null = null;
+      if (isAnual) {
+        valor = consolidarValores(kpiDados.map((d) => d.valor_numerico).filter((v): v is number => v !== null), k.unidade);
+      } else {
+        valor = kpiDados.length > 0 ? kpiDados[0].valor_numerico : null;
+      }
+
       const meta = k.meta_valor;
       const percentual =
         valor != null && meta && meta !== 0
@@ -101,9 +149,17 @@ export function useDashboardData(filters: Filters) {
 
       let valorAnterior: number | null = null;
       let tendencia: "up" | "down" | "equal" | null = null;
+
       if (filters.comparar && prevQuery.data) {
-        const prev = prevQuery.data.find((d) => d.kpi_id === k.id);
-        valorAnterior = prev?.valor_numerico ?? null;
+        const isPrevAnual = prevPeriodo?.endsWith("-Anual");
+        const prevKpiDados = prevQuery.data.filter((d) => d.kpi_id === k.id);
+
+        if (isPrevAnual) {
+          valorAnterior = consolidarValores(prevKpiDados.map((d) => d.valor_numerico).filter((v): v is number => v !== null), k.unidade);
+        } else {
+          valorAnterior = prevKpiDados.length > 0 ? prevKpiDados[0].valor_numerico : null;
+        }
+
         if (valor != null && valorAnterior != null) {
           if (valor > valorAnterior) tendencia = "up";
           else if (valor < valorAnterior) tendencia = "down";

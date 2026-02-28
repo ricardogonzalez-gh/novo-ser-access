@@ -35,14 +35,24 @@ export function useSparklineData(kpiIds: string[]) {
         .from("dados_kpis")
         .select("kpi_id, periodo, valor_numerico")
         .in("kpi_id", kpiIds)
-        .order("periodo");
+        .order("periodo", { ascending: false });
       if (error) throw error;
+
       const map: Record<string, { periodo: string; valor: number | null }[]> = {};
       for (const d of data ?? []) {
         if (!d.kpi_id) continue;
         if (!map[d.kpi_id]) map[d.kpi_id] = [];
-        map[d.kpi_id].push({ periodo: d.periodo, valor: d.valor_numerico });
+        // Guarda apenas os últimos 4
+        if (map[d.kpi_id].length < 4) {
+          map[d.kpi_id].push({ periodo: d.periodo, valor: d.valor_numerico });
+        }
       }
+
+      // Reverter para ordem cronológica ascendente
+      for (const key in map) {
+        map[key].reverse();
+      }
+
       return map;
     },
   });
