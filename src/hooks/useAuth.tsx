@@ -33,16 +33,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return email.endsWith("@novoser.org.br");
   };
 
-  const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
-    if (error) {
-      console.error("Erro ao buscar perfil:", error.message);
+  const fetchProfile = async (userId: string, attempts = 3, delay = 500) => {
+    for (let i = 0; i < attempts; i++) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (data) {
+        setProfile(data);
+        return;
+      }
+
+      if (i < attempts - 1) {
+        await new Promise(r => setTimeout(r, delay * (i + 1)));
+      }
     }
-    setProfile(data);
+    console.error("Perfil não encontrado após", attempts, "tentativas para userId:", userId);
+    setProfile(null);
   };
 
   useEffect(() => {
