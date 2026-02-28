@@ -67,7 +67,7 @@ const EntradaDados = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [periodo, setPeriodo] = useState(periodoOptions[0].value);
+  const [periodo, setPeriodo] = useState("2026-T1");
   const [showAll, setShowAll] = useState(false);
   const [formData, setFormData] = useState<Record<string, FormEntry>>({});
   const [saving, setSaving] = useState(false);
@@ -233,11 +233,16 @@ const EntradaDados = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {periodoOptions.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>
-                    {o.label} — {currentYear}
-                  </SelectItem>
-                ))}
+                <SelectItem value="2026-T1">2026 — T1</SelectItem>
+                <SelectItem value="2026-T2">2026 — T2</SelectItem>
+                <SelectItem value="2026-T3">2026 — T3</SelectItem>
+                <SelectItem value="2026-T4">2026 — T4</SelectItem>
+                <SelectItem value="2026-Anual">2026 — Anual</SelectItem>
+                <SelectItem value="2025-T1">2025 — T1</SelectItem>
+                <SelectItem value="2025-T2">2025 — T2</SelectItem>
+                <SelectItem value="2025-T3">2025 — T3</SelectItem>
+                <SelectItem value="2025-T4">2025 — T4</SelectItem>
+                <SelectItem value="2025-Anual">2025 — Anual</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -25,11 +25,11 @@ export function AppSidebar() {
           <img
             src="/logo-ins-white.png"
             alt="Logo Novo Ser Branca"
-            className="h-8 object-contain"
+            className="h-10 object-contain drop-shadow-sm"
             onError={(e) => {
               // Fallback for dark mode logo if purely-white version does not exist
               e.currentTarget.src = "/logo-ins.png";
-              e.currentTarget.className = "h-8 object-contain brightness-0 invert";
+              e.currentTarget.className = "h-10 object-contain brightness-0 invert drop-shadow-sm";
             }}
           />
         </div>

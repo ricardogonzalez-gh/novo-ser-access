@@ -24,7 +24,7 @@ const Header = () => {
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
           <SidebarTrigger className="mr-1" />
-          <img src="/logo-ins.png" alt="Instituto Novo Ser" className="h-10 w-auto object-contain hidden sm:block" />
+          <img src="/logo-ins.png" alt="Instituto Novo Ser" className="h-10 w-auto object-contain rounded-lg hidden sm:block" />
           <div className="flex flex-col">
             <span className="font-heading font-semibold text-[#2d2d2d] hidden sm:block">Instituto Novo Ser</span>
             <span className="font-body font-normal text-sm text-[#9a999e] hidden sm:block">Painel de KPIs</span>

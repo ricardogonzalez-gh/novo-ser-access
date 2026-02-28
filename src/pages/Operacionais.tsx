@@ -140,13 +140,18 @@ const Operacionais = () => {
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-muted-foreground">Período</span>
             <Select value={periodo} onValueChange={setPeriodo}>
-              <SelectTrigger className="w-28 bg-background"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-36 bg-background"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="2026-T1">T1</SelectItem>
-                <SelectItem value="2026-T2">T2</SelectItem>
-                <SelectItem value="2026-T3">T3</SelectItem>
-                <SelectItem value="2026-T4">T4</SelectItem>
-                <SelectItem value="2026-Anual">Anual</SelectItem>
+                <SelectItem value="2026-T1">2026 — T1</SelectItem>
+                <SelectItem value="2026-T2">2026 — T2</SelectItem>
+                <SelectItem value="2026-T3">2026 — T3</SelectItem>
+                <SelectItem value="2026-T4">2026 — T4</SelectItem>
+                <SelectItem value="2026-Anual">2026 — Anual</SelectItem>
+                <SelectItem value="2025-T1">2025 — T1</SelectItem>
+                <SelectItem value="2025-T2">2025 — T2</SelectItem>
+                <SelectItem value="2025-T3">2025 — T3</SelectItem>
+                <SelectItem value="2025-T4">2025 — T4</SelectItem>
+                <SelectItem value="2025-Anual">2025 — Anual</SelectItem>
               </SelectContent>
             </Select>
           </div>

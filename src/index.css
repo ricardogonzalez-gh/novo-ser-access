@@ -123,3 +123,26 @@ All colors MUST be HSL.
     @apply font-heading text-primary;
   }
 }
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ad93bf40;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ad93bf80;
+}
+
+/* Transição suave para todos os cards */
+.transition-card {
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}

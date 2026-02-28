@@ -55,54 +55,96 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    let mounted = true;
 
-        if (session?.user) {
-          const allowed = checkDomain(session.user.email);
-          setIsDomainAllowed(allowed);
-          if (allowed) {
-            await fetchProfile(session.user.id);
-          } else {
-            await supabase.auth.signOut();
-          }
-        } else {
-          setIsDomainAllowed(null);
+    // Primeiro, verificar sessão existente
+    const initSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+
+        if (!mounted) return;
+
+        if (error || !session) {
+          // Sem sessão válida - limpar tudo e redirecionar para login
+          setSession(null);
+          setUser(null);
           setProfile(null);
+          setIsDomainAllowed(null);
+          setLoading(false);
+          return;
         }
+
+        setSession(session);
+        setUser(session.user);
+
+        const allowed = checkDomain(session.user.email);
+        setIsDomainAllowed(allowed);
+
+        if (allowed) {
+          await fetchProfile(session.user.id);
+        } else {
+          await supabase.auth.signOut();
+        }
+      } catch (err) {
+        console.error("Erro ao inicializar sessão:", err);
+        if (mounted) {
+          setSession(null);
+          setUser(null);
+          setProfile(null);
+          setIsDomainAllowed(null);
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    initSession();
+
+    // Depois, escutar mudanças de estado (login, logout, token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return;
+
+        if (event === 'SIGNED_OUT' || !session) {
+          setSession(null);
+          setUser(null);
+          setProfile(null);
+          setIsDomainAllowed(null);
+          setLoading(false);
+          return;
+        }
+
+        setSession(session);
+        setUser(session.user);
+
+        const allowed = checkDomain(session.user.email);
+        setIsDomainAllowed(allowed);
+
+        if (allowed) {
+          await fetchProfile(session.user.id);
+        } else {
+          await supabase.auth.signOut();
+        }
+
         setLoading(false);
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        const allowed = checkDomain(session.user.email);
-        setIsDomainAllowed(allowed);
-        if (allowed) {
-          fetchProfile(session.user.id);
-        } else {
-          supabase.auth.signOut();
-        }
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signInWithGoogle = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-      redirectTo: window.location.origin,
-      queryParams: {
-        prompt: "select_account",
+        redirectTo: window.location.origin,
+        queryParams: {
+          prompt: "select_account",
+        },
       },
-    },
     });
   };
 
