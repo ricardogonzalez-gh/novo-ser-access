@@ -21,8 +21,8 @@ interface Props {
 
 const TrendIcon = ({ trend }: { trend: KpiRow["tendencia"] }) => {
   if (trend === "up") return <TrendingUp className="h-4 w-4 text-green-500" />;
-  if (trend === "down") return <TrendingDown className="h-4 w-4 text-red-500" />;
-  if (trend === "equal") return <Minus className="h-4 w-4 text-muted-foreground" />;
+  if (trend === "down") return <TrendingDown className="h-4 w-4 text-[#d27f7b]" />;
+  if (trend === "equal") return <Minus className="h-4 w-4 text-[#9a999e]" />;
   return null;
 };
 

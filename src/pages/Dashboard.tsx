@@ -3,7 +3,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import GlobalFilters from "@/components/dashboard/GlobalFilters";
 import SemaforoPanel from "@/components/dashboard/SemaforoPanel";
 import KpiTable from "@/components/dashboard/KpiTable";
-import KpiEvolutionDrawer from "@/components/dashboard/KpiEvolutionDrawer";
+import KpiDetailDrawer from "@/components/dashboard/KpiDetailDrawer";
 import { useDashboardData, type Filters, type KpiRow } from "@/hooks/useDashboardData";
 import { exportKpisCsv } from "@/lib/exportCsv";
 
@@ -44,7 +44,7 @@ const Dashboard = () => {
         )}
       </div>
 
-      <KpiEvolutionDrawer
+      <KpiDetailDrawer
         kpi={selectedKpi}
         open={!!selectedKpi}
         onClose={() => setSelectedKpi(null)}

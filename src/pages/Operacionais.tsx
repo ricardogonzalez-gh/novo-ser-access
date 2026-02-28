@@ -168,19 +168,19 @@ const Operacionais = () => {
         {!isLoading && barChartData.length > 0 && (
           <div className="rounded-lg border bg-card p-4">
             <h2 className="text-sm font-semibold text-foreground mb-4">
-              Saúde dos Indicadores Operacionais por KPI Estratégico
+              Saúde dos Indicadores por KPI Estratégico
             </h2>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={barChartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="kpi" tick={{ fontSize: 11 }} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart layout="vertical" data={barChartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" horizontal={false} vertical={true} />
+                <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
+                <YAxis dataKey="kpi" type="category" tick={{ fontSize: 11 }} width={80} />
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="verde" name="Verde" fill="#22c55e" stackId="a" />
-                <Bar dataKey="amarelo" name="Amarelo" fill="#eab308" stackId="a" />
-                <Bar dataKey="vermelho" name="Vermelho" fill="#ef4444" stackId="a" />
-                <Bar dataKey="cinza" name="Sem meta" fill="#9ca3af" stackId="a" />
+                <Bar dataKey="amarelo" name="Amarelo" fill="#eec833" stackId="a" />
+                <Bar dataKey="vermelho" name="Vermelho" fill="#d27f7b" stackId="a" />
+                <Bar dataKey="cinza" name="Sem meta" fill="#9a999e" stackId="a" />
               </BarChart>
             </ResponsiveContainer>
           </div>

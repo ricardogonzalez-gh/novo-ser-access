@@ -17,7 +17,7 @@ const SparklineChart = ({ data }: Props) => {
           <Line
             type="monotone"
             dataKey="v"
-            stroke={hasData ? "#3b82f6" : "#9ca3af"}
+            stroke={hasData ? "#8dbb9d" : "#9ca3af"}
             strokeWidth={1.5}
             dot={false}
           />
