@@ -10,6 +10,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     if (loading) {
       const timer = setTimeout(() => setTimedOut(true), 10000);
       return () => clearTimeout(timer);
+    } else {
+      setTimedOut(false);
     }
   }, [loading]);
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useRef, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -27,14 +27,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isDomainAllowed, setIsDomainAllowed] = useState<boolean | null>(null);
+  const mounted = useRef(true);
 
   const checkDomain = (email: string | undefined) => {
     if (!email) return false;
     return email.endsWith("@novoser.org.br");
   };
 
+  const clearState = () => {
+    setSession(null);
+    setUser(null);
+    setProfile(null);
+    setIsDomainAllowed(null);
+  };
+
+  const clearSupabaseStorage = () => {
+    try {
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-')) localStorage.removeItem(key);
+      });
+    } catch (e) {
+      // Silently ignore storage errors
+    }
+  };
+
   const fetchProfile = async (userId: string, attempts = 3, delay = 500) => {
     for (let i = 0; i < attempts; i++) {
+      if (!mounted.current) return;
+
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -42,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .single();
 
       if (data) {
-        setProfile(data);
+        if (mounted.current) setProfile(data);
         return;
       }
 
@@ -50,93 +70,101 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await new Promise(r => setTimeout(r, delay * (i + 1)));
       }
     }
-    console.error("Perfil não encontrado após", attempts, "tentativas para userId:", userId);
-    setProfile(null);
+    console.error("Perfil não encontrado após", attempts, "tentativas");
+    if (mounted.current) setProfile(null);
+  };
+
+  const handleSession = async (newSession: Session | null) => {
+    if (!mounted.current) return;
+
+    if (!newSession) {
+      clearState();
+      setLoading(false);
+      return;
+    }
+
+    setSession(newSession);
+    setUser(newSession.user);
+
+    const allowed = checkDomain(newSession.user.email);
+    setIsDomainAllowed(allowed);
+
+    if (allowed) {
+      await fetchProfile(newSession.user.id);
+    } else {
+      clearState();
+      clearSupabaseStorage();
+      await supabase.auth.signOut();
+    }
+
+    if (mounted.current) setLoading(false);
   };
 
   useEffect(() => {
-    let mounted = true;
+    mounted.current = true;
 
-    // Primeiro, verificar sessão existente
     const initSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const { data: { session: existingSession }, error } = await supabase.auth.getSession();
 
-        if (!mounted) return;
-
-        if (error || !session) {
-          // Sem sessão válida - limpar tudo e redirecionar para login
-          setSession(null);
-          setUser(null);
-          setProfile(null);
-          setIsDomainAllowed(null);
-          setLoading(false);
+        if (error) {
+          console.error("Erro ao obter sessão:", error.message);
+          clearSupabaseStorage();
+          if (mounted.current) {
+            clearState();
+            setLoading(false);
+          }
           return;
         }
 
-        setSession(session);
-        setUser(session.user);
-
-        const allowed = checkDomain(session.user.email);
-        setIsDomainAllowed(allowed);
-
-        if (allowed) {
-          await fetchProfile(session.user.id);
-        } else {
-          await supabase.auth.signOut();
-        }
+        await handleSession(existingSession);
       } catch (err) {
-        console.error("Erro ao inicializar sessão:", err);
-        if (mounted) {
-          setSession(null);
-          setUser(null);
-          setProfile(null);
-          setIsDomainAllowed(null);
+        console.error("Erro crítico ao inicializar sessão:", err);
+        clearSupabaseStorage();
+        if (mounted.current) {
+          clearState();
+          setLoading(false);
         }
-      } finally {
-        if (mounted) setLoading(false);
       }
     };
 
     initSession();
 
-    // Depois, escutar mudanças de estado (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted) return;
+      async (event, newSession) => {
+        if (!mounted.current) return;
 
-        if (event === 'SIGNED_OUT' || !session) {
-          setSession(null);
-          setUser(null);
-          setProfile(null);
-          setIsDomainAllowed(null);
+        if (event === 'SIGNED_OUT') {
+          clearState();
           setLoading(false);
           return;
         }
 
-        setSession(session);
-        setUser(session.user);
-
-        const allowed = checkDomain(session.user.email);
-        setIsDomainAllowed(allowed);
-
-        if (allowed) {
-          await fetchProfile(session.user.id);
-        } else {
-          await supabase.auth.signOut();
+        if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+          await handleSession(newSession);
         }
-
-        setLoading(false);
       }
     );
 
+    // Safety timeout: if still loading after 8s, force reset
+    const safetyTimer = setTimeout(() => {
+      if (mounted.current && loading) {
+        console.warn("Auth timeout — forçando reset");
+        clearSupabaseStorage();
+        clearState();
+        setLoading(false);
+      }
+    }, 8000);
+
     return () => {
-      mounted = false;
+      mounted.current = false;
       subscription.unsubscribe();
+      clearTimeout(safetyTimer);
     };
   }, []);
 
   const signInWithGoogle = async () => {
+    clearSupabaseStorage();
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -149,9 +177,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
+    clearSupabaseStorage();
     await supabase.auth.signOut();
-    setProfile(null);
-    setIsDomainAllowed(null);
+    clearState();
   };
 
   return (
