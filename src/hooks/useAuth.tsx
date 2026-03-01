@@ -21,6 +21,13 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Detect if the current URL contains an OAuth callback (hash with access_token or code)
+function urlHasAuthCallback(): boolean {
+  const hash = window.location.hash;
+  const search = window.location.search;
+  return hash.includes("access_token") || hash.includes("refresh_token") || search.includes("code=");
+}
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -28,6 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [isDomainAllowed, setIsDomainAllowed] = useState<boolean | null>(null);
   const mounted = useRef(true);
+  const sessionHandled = useRef(false);
 
   const checkDomain = (email: string | undefined) => {
     if (!email) return false;
@@ -41,21 +49,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsDomainAllowed(null);
   };
 
-  const clearSupabaseStorage = () => {
-    try {
-      Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('sb-')) localStorage.removeItem(key);
-      });
-    } catch (e) {
-      // Silently ignore storage errors
-    }
-  };
-
   const fetchProfile = async (userId: string, attempts = 3, delay = 500) => {
     for (let i = 0; i < attempts; i++) {
       if (!mounted.current) return;
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", userId)
@@ -83,17 +81,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    // Prevent double handling
+    sessionHandled.current = true;
+
     setSession(newSession);
     setUser(newSession.user);
 
-    const allowed = checkDomain(newSession.user.email);
+    const email = newSession.user.email;
+    console.log("[Auth] Sessão recebida para:", email);
+
+    const allowed = checkDomain(email);
     setIsDomainAllowed(allowed);
 
     if (allowed) {
       await fetchProfile(newSession.user.id);
     } else {
+      console.warn("[Auth] Domínio não permitido:", email);
       clearState();
-      clearSupabaseStorage();
       await supabase.auth.signOut();
     }
 
@@ -102,37 +106,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     mounted.current = true;
+    const hasCallback = urlHasAuthCallback();
 
-    const initSession = async () => {
-      try {
-        const { data: { session: existingSession }, error } = await supabase.auth.getSession();
-
-        if (error) {
-          console.error("Erro ao obter sessão:", error.message);
-          clearSupabaseStorage();
-          if (mounted.current) {
-            clearState();
-            setLoading(false);
-          }
-          return;
-        }
-
-        await handleSession(existingSession);
-      } catch (err) {
-        console.error("Erro crítico ao inicializar sessão:", err);
-        clearSupabaseStorage();
-        if (mounted.current) {
-          clearState();
-          setLoading(false);
-        }
-      }
-    };
-
-    initSession();
-
+    // Only use onAuthStateChange as the single source of truth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
         if (!mounted.current) return;
+        console.log("[Auth] Event:", event, "Session:", !!newSession);
 
         if (event === 'SIGNED_OUT') {
           clearState();
@@ -140,21 +120,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
-        if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        // INITIAL_SESSION is fired after getSession resolves internally
+        // SIGNED_IN is fired after OAuth callback is processed
+        if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           await handleSession(newSession);
         }
       }
     );
 
-    // Safety timeout: if still loading after 8s, force reset
+    // Safety timeout — only if NOT processing an OAuth callback
+    // Give extra time (15s) when callback is in URL to let Supabase process it
+    const timeoutMs = hasCallback ? 15000 : 8000;
     const safetyTimer = setTimeout(() => {
-      if (mounted.current && loading) {
-        console.warn("Auth timeout — forçando reset");
-        clearSupabaseStorage();
+      if (mounted.current && loading && !sessionHandled.current) {
+        console.warn("[Auth] Timeout após", timeoutMs, "ms — redirecionando para login");
         clearState();
         setLoading(false);
       }
-    }, 8000);
+    }, timeoutMs);
 
     return () => {
       mounted.current = false;
@@ -164,7 +147,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signInWithGoogle = async () => {
-    clearSupabaseStorage();
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -177,7 +159,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    clearSupabaseStorage();
     await supabase.auth.signOut();
     clearState();
   };
