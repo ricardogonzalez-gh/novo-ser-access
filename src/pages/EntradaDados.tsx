@@ -22,15 +22,21 @@ import { useToast } from "@/hooks/use-toast";
 import { Save, ShieldAlert } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const currentYear = new Date().getFullYear();
 const periodoOptions = [
-  { value: `${currentYear}-T1`, label: "T1" },
-  { value: `${currentYear}-T2`, label: "T2" },
-  { value: `${currentYear}-T3`, label: "T3" },
-  { value: `${currentYear}-T4`, label: "T4" },
-  { value: `${currentYear}-S1`, label: "S1" },
-  { value: `${currentYear}-S2`, label: "S2" },
-  { value: `${currentYear}-Anual`, label: "Anual" },
+  { value: "2026-T1", label: "2026 — T1" },
+  { value: "2026-T2", label: "2026 — T2" },
+  { value: "2026-T3", label: "2026 — T3" },
+  { value: "2026-T4", label: "2026 — T4" },
+  { value: "2026-S1", label: "2026 — S1" },
+  { value: "2026-S2", label: "2026 — S2" },
+  { value: "2026-Anual", label: "2026 — Anual" },
+  { value: "2025-T1", label: "2025 — T1" },
+  { value: "2025-T2", label: "2025 — T2" },
+  { value: "2025-T3", label: "2025 — T3" },
+  { value: "2025-T4", label: "2025 — T4" },
+  { value: "2025-S1", label: "2025 — S1" },
+  { value: "2025-S2", label: "2025 — S2" },
+  { value: "2025-Anual", label: "2025 — Anual" },
 ];
 
 const perspectivaLabels: Record<string, string> = {
@@ -233,16 +239,11 @@ const EntradaDados = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="2026-T1">2026 — T1</SelectItem>
-                <SelectItem value="2026-T2">2026 — T2</SelectItem>
-                <SelectItem value="2026-T3">2026 — T3</SelectItem>
-                <SelectItem value="2026-T4">2026 — T4</SelectItem>
-                <SelectItem value="2026-Anual">2026 — Anual</SelectItem>
-                <SelectItem value="2025-T1">2025 — T1</SelectItem>
-                <SelectItem value="2025-T2">2025 — T2</SelectItem>
-                <SelectItem value="2025-T3">2025 — T3</SelectItem>
-                <SelectItem value="2025-T4">2025 — T4</SelectItem>
-                <SelectItem value="2025-Anual">2025 — Anual</SelectItem>
+                {periodoOptions.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

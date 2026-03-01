@@ -56,20 +56,49 @@ const Operacionais = () => {
   const dadosQuery = useQuery({
     queryKey: ["dados-kpis-op", periodo],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("dados_kpis")
-        .select("*")
-        .eq("periodo", periodo);
+      const isAnual = periodo.endsWith("-Anual");
+      const year = periodo.split("-")[0];
+
+      let query = supabase.from("dados_kpis").select("*");
+
+      if (isAnual) {
+        query = query.like("periodo", `${year}-T%`).order("periodo", { ascending: true });
+      } else {
+        query = query.eq("periodo", periodo);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
   });
 
+  const isAnual = periodo.endsWith("-Anual");
+
   const rows = (kpisQuery.data ?? [])
     .filter((k) => areaFilter === "Todas" || k.area === areaFilter)
     .map((k) => {
-      const dado = (dadosQuery.data ?? []).find((d) => d.kpi_id === k.id);
-      const valor = dado?.valor_numerico ?? null;
+      let valor: number | null = null;
+
+      if (isAnual) {
+        const kpiDados = (dadosQuery.data ?? []).filter((d) => d.kpi_id === k.id);
+        const valores = kpiDados.map((d) => d.valor_numerico).filter((v): v is number => v != null);
+        if (valores.length > 0) {
+          if (k.unidade === "R$" || k.unidade === "nº") {
+            valor = valores.reduce((a, b) => a + b, 0);
+          } else if (k.unidade === "%" || k.unidade === "1-5") {
+            valor = Number((valores.reduce((a, b) => a + b, 0) / valores.length).toFixed(2));
+          } else if (k.unidade === "S/N") {
+            valor = valores[valores.length - 1];
+          } else {
+            valor = valores.reduce((a, b) => a + b, 0);
+          }
+        }
+      } else {
+        const dado = (dadosQuery.data ?? []).find((d) => d.kpi_id === k.id);
+        valor = dado?.valor_numerico ?? null;
+      }
+
       const semaforo = calcularSemaforo(valor, k.meta_valor, k.faixa_verde ?? 80, k.faixa_amarela ?? 50);
       return { ...k, valor, semaforo };
     });

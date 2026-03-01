@@ -29,7 +29,7 @@ const Login = () => {
             <img
               src="/logo-ins.png"
               alt="Instituto Novo Ser"
-              className="h-[100px] w-auto object-contain drop-shadow-sm"
+              className="h-[100px] w-auto object-contain rounded-xl shadow-sm"
             />
           </div>
           <div>

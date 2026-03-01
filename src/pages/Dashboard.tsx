@@ -31,7 +31,12 @@ const Dashboard = () => {
         />
 
         {isLoading ? (
-          <p className="text-muted-foreground text-center py-12">Carregando dados...</p>
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center space-y-3">
+              <div className="animate-spin h-8 w-8 border-4 border-[#ad93bf] border-t-transparent rounded-full mx-auto" />
+              <p className="text-muted-foreground text-sm">Carregando indicadores...</p>
+            </div>
+          </div>
         ) : (
           <>
             <SemaforoPanel kpis={kpis} />

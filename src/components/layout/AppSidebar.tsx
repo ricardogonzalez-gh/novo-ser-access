@@ -24,12 +24,11 @@ export function AppSidebar() {
         <div className="flex justify-center py-6 border-b border-white/10">
           <img
             src="/logo-ins-white.png"
-            alt="Logo Novo Ser Branca"
-            className="h-10 object-contain drop-shadow-sm"
+            alt="Logo"
+            className="h-10 object-contain rounded-lg"
             onError={(e) => {
-              // Fallback for dark mode logo if purely-white version does not exist
               e.currentTarget.src = "/logo-ins.png";
-              e.currentTarget.className = "h-10 object-contain brightness-0 invert drop-shadow-sm";
+              e.currentTarget.className = "h-10 object-contain brightness-0 invert rounded-lg";
             }}
           />
         </div>

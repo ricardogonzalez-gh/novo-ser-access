@@ -12,9 +12,8 @@ const SparklineChart = ({ data }: Props) => {
     ? data.map((d) => ({ v: d.valor ?? 0 }))
     : [{ v: 0 }, { v: 0 }, { v: 0 }, { v: 0 }];
 
-  // Calcular domínio para garantir variação visual
-  const min = hasData ? Math.min(...valores) * 0.9 : 0;
-  const max = hasData ? Math.max(...valores) * 1.1 : 1;
+  const min = hasData ? Math.min(...valores) * 0.85 : 0;
+  const max = hasData ? Math.max(...valores) * 1.15 : 1;
 
   return (
     <div className="w-20 h-[30px] shrink-0">
