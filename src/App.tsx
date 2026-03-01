@@ -10,6 +10,7 @@ import AccessDenied from "./pages/AccessDenied";
 import Dashboard from "./pages/Dashboard";
 import EntradaDados from "./pages/EntradaDados";
 import Operacionais from "./pages/Operacionais";
+import Historico from "./pages/Historico";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <EntradaDados />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/historico"
+              element={
+                <ProtectedRoute>
+                  <Historico />
                 </ProtectedRoute>
               }
             />

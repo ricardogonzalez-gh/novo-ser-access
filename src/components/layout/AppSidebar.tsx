@@ -1,4 +1,4 @@
-import { LayoutDashboard, Settings, Database } from "lucide-react";
+import { LayoutDashboard, Settings, Database, History } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
@@ -15,6 +15,7 @@ const items = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Operacionais", url: "/operacionais", icon: Settings },
   { title: "Entrada de Dados", url: "/entrada-dados", icon: Database },
+  { title: "Histórico", url: "/historico", icon: History },
 ];
 
 export function AppSidebar() {

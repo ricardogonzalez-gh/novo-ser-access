@@ -7,16 +7,17 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import type { Filters } from "@/hooks/useDashboardData";
 
 interface Props {
   filters: Filters;
   onChange: (f: Filters) => void;
   onExport: () => void;
+  onExportPdf: () => void;
 }
 
-const GlobalFilters = ({ filters, onChange, onExport }: Props) => {
+const GlobalFilters = ({ filters, onChange, onExport, onExportPdf }: Props) => {
   const set = (key: keyof Filters, value: string | boolean) =>
     onChange({ ...filters, [key]: value });
 
@@ -78,6 +79,10 @@ const GlobalFilters = ({ filters, onChange, onExport }: Props) => {
         <Button variant="outline" size="sm" onClick={onExport} className="border-[#ad93bf] text-[#ad93bf] hover:bg-[#ad93bf]/10 bg-transparent shadow-none">
           <Download className="h-4 w-4 mr-1" />
           Exportar
+        </Button>
+        <Button variant="outline" size="sm" onClick={onExportPdf} className="border-[#ad93bf] text-[#ad93bf] hover:bg-[#ad93bf]/10 bg-transparent shadow-none">
+          <FileText className="h-4 w-4 mr-1" />
+          PDF
         </Button>
       </div>
     </div>
