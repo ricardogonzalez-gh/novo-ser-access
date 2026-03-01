@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import EntradaDados from "./pages/EntradaDados";
 import Operacionais from "./pages/Operacionais";
 import Historico from "./pages/Historico";
+import ImportExport from "./pages/ImportExport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Historico />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/import-export"
+              element={
+                <ProtectedRoute>
+                  <ImportExport />
                 </ProtectedRoute>
               }
             />

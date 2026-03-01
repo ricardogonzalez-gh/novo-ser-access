@@ -7,6 +7,7 @@ import KpiDetailDrawer from "@/components/dashboard/KpiDetailDrawer";
 import { useDashboardData, type Filters, type KpiRow } from "@/hooks/useDashboardData";
 import { exportKpisCsv } from "@/lib/exportCsv";
 import { exportKpisPdf } from "@/lib/exportPdf";
+import { exportKpisXlsx } from "@/lib/exportXlsx";
 
 const Dashboard = () => {
   const [filters, setFilters] = useState<Filters>({
@@ -30,6 +31,7 @@ const Dashboard = () => {
           onChange={setFilters}
           onExport={() => exportKpisCsv(kpis, filters.periodo)}
           onExportPdf={() => exportKpisPdf(kpis, filters.periodo)}
+          onExportXlsx={() => exportKpisXlsx(kpis, filters.periodo)}
         />
 
         {isLoading ? (

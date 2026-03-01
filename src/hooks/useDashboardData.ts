@@ -150,7 +150,7 @@ export function useDashboardData(filters: Filters) {
       let valorAnterior: number | null = null;
       let tendencia: "up" | "down" | "equal" | null = null;
 
-      if (filters.comparar && prevQuery.data) {
+      if (filters.comparar && prevQuery.data && !prevQuery.isLoading) {
         const isPrevAnual = prevPeriodo?.endsWith("-Anual");
         const prevKpiDados = prevQuery.data.filter((d) => d.kpi_id === k.id);
 
@@ -185,8 +185,10 @@ export function useDashboardData(filters: Filters) {
       };
     });
 
+  const isLoadingPrev = filters.comparar && prevPeriodo ? prevQuery.isLoading : false;
+
   return {
     kpis,
-    isLoading: kpisQuery.isLoading || dadosQuery.isLoading,
+    isLoading: kpisQuery.isLoading || dadosQuery.isLoading || isLoadingPrev,
   };
 }
